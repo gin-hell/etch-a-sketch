@@ -10,7 +10,7 @@
 
 		<style>
 
-			div {
+			.div-stuff {
 				-webkit-user-select: none;
 				-moz-user-seleect: none;
 				user-select: none;
@@ -50,17 +50,33 @@
 				/*border: 1px solid black;*/
 
 			}
+
+			#tester {
+				background: red;
+			    color: white;
+			    width: 100px;
+			    height: 100px;
+			    border-radius: 50%;
+			    margin: 0px;
+			    position: absolute;
+			    bottom: 0px;
+			    left: 0px;
+			    transform: rotateZ(-10deg)
+			}
+
 		</style>
 
-		<div>
+		<div class="div-stuff">
 			<img id="frame" src="etch-a-sketch.png">
 			<img id="screen" src="screen.png">
-			<div id ="canvasContainer"></div>
-			<p>etch a sketch made by jen</p>
+			<div class="div-stuff" id ="canvasContainer"></div>
+			<select id="inputportselector"></select>
+			<!-- <select id="outputportselector"></select> -->
+			<div id="tester">-</div>
 		</div>
 		
-		<script src="p5.js"></script>
-		<script src="WebMIDIAPI.min.js"></script>
+		<script src="js/p5.js"></script>
+		<script src="js/soundfont-player.min.js"></script>
 
 		<script>
 
@@ -71,6 +87,9 @@
 			var canvasWidth = screenWidth-(screenWidth*.021667)
 			var canvasHeight = screenHeight-(screenHeight*.026020)
 
+			var pianoPlayer = new (window.AudioContext || window.webkitAudioContext);
+
+			
 
 
 			function setup(){
@@ -83,7 +102,8 @@
 			// request MIDI access
 			if (navigator.requestMIDIAccess) {
 			    navigator.requestMIDIAccess({
-			        sysex: false // this defaults to 'false' and we won't be covering sysex in this article. 
+			        // software: true,
+			        sysex: false
 			    }).then(onMIDISuccess, onMIDIFailure);
 			} else {
 			    alert("No MIDI support in your browser.");
@@ -94,27 +114,75 @@
 			var pixelX = 0;
 			var pixelY = 0;
 
-			// midi functions
+
+
+
+			// midi functions~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+			var midi = null;
+			var port = null;
+			var midiDevices = [];
+
 			function onMIDISuccess(midiAccess) {
 			    // when we get a succesful response, run this code
 				// console.log('MIDI Access Object', midiAccess);
 
-				var midi = midiAccess;
+				midi = midiAccess;
+
 				var inputs = midi.inputs.values();
 				for ( var input = inputs.next(); input && !input.done; input = inputs.next() ) {
 					input.value.onmidimessage = onMIDIMessage;
-				}
+					}
 
-				var outputs = midi.outputs.forEach(function(key,port){
-					} 
-				);
+				// input selection menu
+				// var i = 0;
+				// for (var input of midi.inputs.values()) {
+				// 	var opt = document.createElement("option");
+				// 	opt.text = input.name;
+				// 	opt.value = i;
+				// 	midiDevices.push( input );
+				// 	document.getElementById("inputportselector").add(opt);
+				// 	i++;
+				//  }
 
-				console.log(outputs;
+				// output selection menu
+				// for ( var output of midi.outputs.values()) {
+				//     var opt = document.createElement("option");
+				//     opt.text = output.name;
+				//     document.getElementById("outputportselector").add(opt);
+				// }	
+
+				document.getElementById("inputportselector").addEventListener("change",function(){
+					// console.log( midiDevices[this.value] )
+					for (var i = 0; i < midiDevices.length; i++) {
+						midiDevices[i].onmidimessage = null;
+					};
+					midiDevices[this.value].onmidimessage = onMIDIMessage;
+
+				});				
 			}
+
+			var channel = -1;
+			var channelListening = false;
+
+			var tester = document.getElementById('tester');
+			tester.addEventListener('click',function(){
+				channelListening = true;
+				// show some kinda modal
+			})
 
 			function onMIDIMessage(message){
 
-				if(message.data[1] == 16){
+
+				if(channelListening==true){
+					channel= message.data[1] ;
+					channelListening=false;
+					// update modal to say "ready"
+					// or just display none
+				}
+
+				if(message.data[1] == channel){
 					midiX = message.data[2];
 					pixelX = midiX*(canvasWidth/127);
 				}
@@ -122,18 +190,52 @@
 				if(message.data[1] == 23){
 					midiY = Math.abs( message.data[2] - 127 );
 					pixelY = midiY*(canvasHeight/127);
+					// console.log(message.data)
  				}
 
- 				console.log(midiX, midiY);
 			}
 
-			var sX = canvasWidth/127;
-			var sY = canvasHeight/127;
+			document.addEventListener("keydown", function(event){
 
+				 var dX = 1.5
+
+				if(event.keyCode == 39){
+					if(pixelX < canvasWidth){
+						pixelX += sX*dX
+					}
+				} else if(event.keyCode == 37){
+					if(pixelX > 0){
+						pixelX -= sX*dX
+					}
+				} else if(event.keyCode == 38){
+					if(pixelY > 0){
+						pixelY -= sX*dX
+					}
+				} else if(event.keyCode == 40){
+					if(pixelY < canvasHeight){
+						pixelY += sX*dX
+					}
+				}
+
+			});
+
+
+
+			var sX = canvasWidth/127;
+
+
+			var piano = Soundfont.instrument(pianoPlayer, 'acoustic_grand_piano' ).then(function (piano) {
+				piano.stop();
+				piano.start(21);
+				console.log(piano)
+
+			});
 
 			function myPixel(){
 				fill("#000000");
-				rect(pixelX,pixelY, sX, sX);
+				rect(pixelX, pixelY, sX, sX);
+
+
 			}
 
 
@@ -142,8 +244,8 @@
 				if(pixelX >= canvasWidth-sX){
 					pixelX = canvasWidth-1.5*sX;
 				}
-				if (pixelY >= canvasHeight-sY){
-					pixelY = canvasHeight-2*sY;
+				if (pixelY >= canvasHeight-sX){
+					pixelY = canvasHeight-2*sX;
 				}
 
 					myPixel();
