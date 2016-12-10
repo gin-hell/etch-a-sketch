@@ -51,17 +51,89 @@
 
 			}
 
-			#tester {
-				background: red;
+			#dialL {
+			    background: gainsboro;
 			    color: white;
-			    width: 100px;
-			    height: 100px;
+			    width: 13%;
+			    height: 16.11%;
 			    border-radius: 50%;
 			    margin: 0px;
 			    position: absolute;
-			    bottom: 0px;
-			    left: 0px;
-			    transform: rotateZ(-10deg)
+			    bottom: 0.5%;
+			    left: 1%;
+			    transform: rotateZ(0deg);
+			}
+
+			#dialR {
+			    background: gainsboro;
+			    color: white;
+			    width: 13%;
+			    height: 16.11%;
+			    border-radius: 50%;
+			    margin: 0px;
+			    position: absolute;
+			    bottom: 0.5%;
+			    right: 1%;
+			    transform: rotateZ(0deg)
+			}
+
+			#modal {
+				position: fixed;
+				top: 0px;
+				left: 0px;
+				background: rgba(0,0,0,0.75);
+				width: 100%;
+				height: 100%;
+				z-index: 99999;
+			}
+
+			#modal-inner {
+			    padding: 20px;
+			    width: 70%;
+			    border-radius: 10px;
+			    background: #ccc;
+			    margin: 10% auto;
+			    text-align: left;
+			}
+
+			#modalL {
+				position: fixed;
+				display: none;
+				top: 0px;
+				left: 0px;
+				background: rgba(0,0,0,0.75);
+				width: 100%;
+				height: 100%;
+				z-index: 99999;
+			}
+
+			#modal-innerL {
+			    padding: 20px;
+			    width: 50%;
+			    border-radius: 10px;
+			    background: #ccc;
+			    margin: 10% auto;
+			    text-align: center;
+			}
+
+			#modalR {
+				position: fixed;
+				display: none;
+				top: 0px;
+				left: 0px;
+				background: rgba(0,0,0,0.75);
+				width: 100%;
+				height: 100%;
+				z-index: 99999;
+			}
+
+			#modal-innerR {
+			    padding: 20px;
+			    width: 50%;
+			    border-radius: 10px;
+			    background: #ccc;
+			    margin: 10% auto;
+			    text-align: center;
 			}
 
 		</style>
@@ -70,15 +142,69 @@
 			<img id="frame" src="etch-a-sketch.png">
 			<img id="screen" src="screen.png">
 			<div class="div-stuff" id ="canvasContainer"></div>
-			<select id="inputportselector"></select>
-			<!-- <select id="outputportselector"></select> -->
-			<div id="tester">-</div>
-		</div>
+
+			<div id="modal">	
+				<div id="modal-inner"> 
+					
+					<p> MIDI piano Etch A Sketch instrument</p>
+
+					<p>for use with external midi controller:</p>
 		
+						- connect midi device
+					<br>
+						- click on left-hand dial then move knob to assign knob to assign it to the dial
+					<br>
+						- repeat for right-hand dial
+					<br>
+					<p>or if no midi controller:</p>
+						- use arrow keys to draw 
+					<br>
+					<p>to clear drawing, press "" key </p>
+
+					<button id="close">close</button>
+				</div>
+			</div>
+
+			<div id="dialL">|</div>
+		
+			<div id="dialR">|</div>
+
+			<div id="modalL">
+				<div id="modal-innerL">move MIDI input for left dial</div>
+			</div>
+
+			<div id="modalR">
+				<div id="modal-innerR">move MIDI input for right dial</div>
+			</div>
+
+
+		</div>
+
+
+		<div class="div-stuff">
+			<select id="inputportselector"></select>		
+			<button id="show">show info</button>
+		</div>
+
+
 		<script src="js/p5.js"></script>
 		<script src="js/soundfont-player.min.js"></script>
 
 		<script>
+
+
+			var modal = document.getElementById('modal');
+			
+			var close = document.getElementById('close');
+			close.onclick = function(){
+				modal.style.display = "none";
+			}
+
+			var show = document.getElementById('show');
+			show.onclick = function(){
+				modal.style.display = "block";
+			}
+
 
 			var myScreen = document.getElementById("screen");
 			var screenWidth = myScreen.width;
@@ -87,10 +213,12 @@
 			var canvasWidth = screenWidth-(screenWidth*.021667)
 			var canvasHeight = screenHeight-(screenHeight*.026020)
 
-			var pianoPlayer = new (window.AudioContext || window.webkitAudioContext);
+			var dialL = document.getElementById("dialL")
+			var dialR = document.getElementById("dialL")
 
-			
+			var audioCtx = new (window.AudioContext || window.webkitAudioContext);
 
+		
 
 			function setup(){
 				var canvas = createCanvas(canvasWidth,canvasHeight);
@@ -117,7 +245,7 @@
 
 
 
-			// midi functions~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// midi input functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 			var midi = null;
@@ -135,23 +263,18 @@
 					input.value.onmidimessage = onMIDIMessage;
 					}
 
-				// input selection menu
-				// var i = 0;
-				// for (var input of midi.inputs.values()) {
-				// 	var opt = document.createElement("option");
-				// 	opt.text = input.name;
-				// 	opt.value = i;
-				// 	midiDevices.push( input );
-				// 	document.getElementById("inputportselector").add(opt);
-				// 	i++;
-				//  }
 
-				// output selection menu
-				// for ( var output of midi.outputs.values()) {
-				//     var opt = document.createElement("option");
-				//     opt.text = output.name;
-				//     document.getElementById("outputportselector").add(opt);
-				// }	
+
+				// input selection menu
+				var i = 0;
+				for (var input of midi.inputs.values()) {
+					var opt = document.createElement("option");
+					opt.text = input.name;
+					opt.value = i;
+					midiDevices.push( input );
+					document.getElementById("inputportselector").add(opt);
+					i++;
+				 }	
 
 				document.getElementById("inputportselector").addEventListener("change",function(){
 					// console.log( midiDevices[this.value] )
@@ -163,35 +286,66 @@
 				});				
 			}
 
-			var channel = -1;
-			var channelListening = false;
+			// midi --> pixel functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-			var tester = document.getElementById('tester');
-			tester.addEventListener('click',function(){
-				channelListening = true;
-				// show some kinda modal
+// get input channel
+			var channelL = -1;
+			var channelListeningL = false;
+			var channelR = -2;
+			var channelListeningR = false;
+
+			var modalL;
+			var modalR;
+
+			var dialL = document.getElementById('dialL');
+			dialL.addEventListener('click',function(){
+				channelListeningL = true;
+			
+				modalL = document.getElementById('modalL');
+				modalL.style.display = "block";
+				
+			})
+
+
+
+			var dialR = document.getElementById('dialR');
+			dialR.addEventListener('click',function(){
+				channelListeningR = true;
+
+				modalR = document.getElementById('modalR');
+				modalR.style.display = "block";
+
 			})
 
 			function onMIDIMessage(message){
 
-
-				if(channelListening==true){
-					channel= message.data[1] ;
-					channelListening=false;
-					// update modal to say "ready"
-					// or just display none
+				if(channelListeningL==true){
+					channelL= message.data[1] ;
+					channelListeningL=false;
+					modalL.style.display = "none"
 				}
 
-				if(message.data[1] == channel){
+				if(message.data[1] == channelL){
 					midiX = message.data[2];
 					pixelX = midiX*(canvasWidth/127);
 				}
 
-				if(message.data[1] == 23){
-					midiY = Math.abs( message.data[2] - 127 );
-					pixelY = midiY*(canvasHeight/127);
-					// console.log(message.data)
+				if(channelListeningR==true){
+					channelR= message.data[1] ;
+					channelListeningR=false;
+					modalR.style.display = "none"
+				}
+
+				if(message.data[1] == channelR){
+					midiY = ( message.data[2] );
+					pixelY = Math.abs( midiY*(canvasHeight/127) - (canvasHeight));
  				}
+
+				var degL = (midiX * 2.8125) - 180 + "deg"
+				dialL.style.transform =	"rotateZ(" + degL.toString() + ")";
+
+				var degR = (midiY * 2.8125) - 180 + "deg"				
+				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
 
 			}
 
@@ -217,6 +371,12 @@
 					}
 				}
 
+				var degL = (pixelX * 360/canvasWidth) - 180 + "deg"
+				dialL.style.transform =	"rotateZ(" + degL.toString() + ")";
+
+				var degR = (pixelY * 360/canvasHeight) - 180 + "deg"			
+				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
+
 			});
 
 
@@ -224,10 +384,10 @@
 			var sX = canvasWidth/127;
 
 
-			var piano = Soundfont.instrument(pianoPlayer, 'acoustic_grand_piano' ).then(function (piano) {
+			var piano = Soundfont.instrument(audioCtx, 'acoustic_grand_piano' ).then(function (piano) {
 				piano.stop();
 				piano.start(21);
-				console.log(piano)
+				// console.log(piano)
 
 			});
 
