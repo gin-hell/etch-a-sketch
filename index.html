@@ -4,6 +4,7 @@
 
 		<title> Etch A Sketch </title>
 		<meta charset="utf-8">
+		<meta description="midi piano Etch A Sketch App">
 	</head>
 
 	<body>
@@ -47,7 +48,6 @@
 				top: 14.8%;
 				height: 68%;
 				width: 78%;
-				/*border: 1px solid black;*/
 
 			}
 
@@ -152,14 +152,14 @@
 		
 						- connect midi device
 					<br>
-						- click on left-hand dial then move knob to assign knob to assign it to the dial
+						- click dial to assign its MIDI input
 					<br>
 						- repeat for right-hand dial
 					<br>
 					<p>or if no midi controller:</p>
 						- use arrow keys to draw 
 					<br>
-					<p>to clear drawing, press "" key </p>
+					<p>to clear drawing, press delete key </p>
 
 					<button id="close">close</button>
 				</div>
@@ -170,11 +170,11 @@
 			<div id="dialR">|</div>
 
 			<div id="modalL">
-				<div id="modal-innerL">move MIDI input for left dial</div>
+				<div id="modal-innerL">move a control on your MIDI device to assign it to the left dial</div>
 			</div>
 
 			<div id="modalR">
-				<div id="modal-innerR">move MIDI input for right dial</div>
+				<div id="modal-innerR">move a control on your MIDI device to assign it to the right dial</div>
 			</div>
 
 
@@ -186,11 +186,15 @@
 			<button id="show">show info</button>
 		</div>
 
+		<audio src="piano/piano.30.wav" type="audio/wav" controls autoplay></audio>
+
 
 		<script src="js/p5.js"></script>
 		<script src="js/soundfont-player.min.js"></script>
 
 		<script>
+
+		// setup midi && pixel && canvas variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 			var modal = document.getElementById('modal');
@@ -216,7 +220,6 @@
 			var dialL = document.getElementById("dialL")
 			var dialR = document.getElementById("dialL")
 
-			var audioCtx = new (window.AudioContext || window.webkitAudioContext);
 
 		
 
@@ -227,30 +230,24 @@
 			}
 
 
-			// request MIDI access
-			if (navigator.requestMIDIAccess) {
-			    navigator.requestMIDIAccess({
-			        // software: true,
-			        sysex: false
-			    }).then(onMIDISuccess, onMIDIFailure);
-			} else {
-			    alert("No MIDI support in your browser.");
-			}
+			// request MIDI access // does browser have midi ?? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			var midiX = 0;
 			var midiY = 0;
 			var pixelX = 0;
 			var pixelY = 0;
 
-
-
-
-			// midi input functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 			var midi = null;
-			var port = null;
 			var midiDevices = [];
+
+			if (navigator.requestMIDIAccess) {
+				    navigator.requestMIDIAccess({
+				        // software: true,
+						sysex: false
+				    }).then(onMIDISuccess, onMIDIFailure);
+			} else {
+			    alert("No MIDI support in your browser.");
+			}
 
 			function onMIDISuccess(midiAccess) {
 			    // when we get a succesful response, run this code
@@ -265,7 +262,8 @@
 
 
 
-				// input selection menu
+				// create input selection menu and listen for selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 				var i = 0;
 				for (var input of midi.inputs.values()) {
 					var opt = document.createElement("option");
@@ -277,7 +275,6 @@
 				 }	
 
 				document.getElementById("inputportselector").addEventListener("change",function(){
-					// console.log( midiDevices[this.value] )
 					for (var i = 0; i < midiDevices.length; i++) {
 						midiDevices[i].onmidimessage = null;
 					};
@@ -286,9 +283,9 @@
 				});				
 			}
 
-			// midi --> pixel functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// listen for midi input ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// get input channel
+
 			var channelL = -1;
 			var channelListeningL = false;
 			var channelR = -2;
@@ -317,7 +314,16 @@
 
 			})
 
+
+
+
+// functions when midi message is received ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 			function onMIDIMessage(message){
+
+			// assign midi input to pixel && dial values ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 				if(channelListeningL==true){
 					channelL= message.data[1] ;
@@ -347,7 +353,11 @@
 				var degR = (midiY * 2.8125) - 180 + "deg"				
 				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
 
+
+
 			}
+
+			// assign arrow keys input to pixel && dial values ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			document.addEventListener("keydown", function(event){
 
@@ -381,20 +391,28 @@
 
 
 
-			var sX = canvasWidth/127;
+			// make piano instrument  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+			var audioCtx = new (window.AudioContext || window.webkitAudioContext);
 
 			var piano = Soundfont.instrument(audioCtx, 'acoustic_grand_piano' ).then(function (piano) {
-				piano.stop();
-				piano.start(21);
-				// console.log(piano)
+
+				function onMIDIMessage (midiX) {
+
+					if( midiX > 20 &&  midiX < 109){
+						piano.stop();
+						piano.start( midiX );
+					}
+						console.log(midiX)
+				}
 
 			});
+
+			var sX = canvasWidth/127;
 
 			function myPixel(){
 				fill("#000000");
 				rect(pixelX, pixelY, sX, sX);
-
 
 			}
 
@@ -417,6 +435,30 @@
 			    // when we get a failed response, run this code
 			    alert("only works on chrome sry !!! :'(");
 			}
+
+
+			// LOAD SAMPLES STUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+			var audioCtx = new AudioContext
+
+			var samples = [];
+
+
+			// for (var i = 0; i < 128; i++) {
+
+			// 	var sample = document.createElement("audio")
+			// 		sample.src = "piano/piano." + i + ".wav"
+			// 		sample.type = "audio/wav"
+			// 		samples.push(sample)
+
+			// };
+
+
+
+
+
+
+
 
 		</script>
 
