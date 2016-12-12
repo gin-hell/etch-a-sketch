@@ -186,7 +186,7 @@
 			<button id="show">show info</button>
 		</div>
 
-		<audio src="piano/piano.30.wav" type="audio/wav" controls autoplay></audio>
+		<!-- <audio src="piano/piano.30.wav" type="audio/wav" controls autoplay></audio> -->
 
 
 		<script src="js/p5.js"></script>
@@ -444,16 +444,16 @@
 			var samples = [];
 
 
-			// for (var i = 0; i < 128; i++) {
+			for (var i = 0; i < 128; i++) {
 
-			// 	var sample = document.createElement("audio")
-			// 		sample.src = "piano/piano." + i + ".wav"
-			// 		sample.type = "audio/wav"
-			// 		samples.push(sample)
+				var sample = document.createElement("audio")
+					sample.src = "piano/piano." + i + ".wav"
+					sample.type = "audio/wav"
+					samples.push(sample)
 
-			// };
+			};
 
-
+			samples[40].play();
 
 
 
