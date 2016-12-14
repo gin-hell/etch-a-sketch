@@ -1,12 +1,11 @@
-var audioCtx = new AudioContext
-
 var samples = [];
 
 
-for (var i = 0; i < 128; i++) {
+for (var i = 1; i < 128; i++) {
 
 	var sample = document.createElement("audio")
-		sample.src = "piano." + i + ".aif"
+		sample.src = "pianooooo/piano-" + i + ".ogg"
 		samples.push(sample)
 
 };
+

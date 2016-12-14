@@ -353,6 +353,11 @@
 				var degR = (midiY * 2.8125) - 180 + "deg"				
 				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
 
+				var note = midiX;
+				var volume = Math.abs((midiY/127) - 1);
+
+				samples[note].volume = volume;				
+				samples[ note ].play();
 
 
 			}
@@ -391,30 +396,19 @@
 
 
 
-			// make piano instrument  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			// draw pixel ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-			var audioCtx = new (window.AudioContext || window.webkitAudioContext);
 
-			var piano = Soundfont.instrument(audioCtx, 'acoustic_grand_piano' ).then(function (piano) {
-
-				function onMIDIMessage (midiX) {
-
-					if( midiX > 20 &&  midiX < 109){
-						piano.stop();
-						piano.start( midiX );
-					}
-						console.log(midiX)
-				}
-
-			});
 
 			var sX = canvasWidth/127;
+			var sY = canvasHeight/127;
 
 			function myPixel(){
 				fill("#000000");
 				rect(pixelX, pixelY, sX, sX);
-
 			}
+
+
 
 
 			function draw(){	
@@ -439,21 +433,29 @@
 
 			// LOAD SAMPLES STUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
 
-			var audioCtx = new AudioContext
 
 			var samples = [];
 
-
-			for (var i = 0; i < 128; i++) {
+			for (var i = 1; i < 129; i++) {
 
 				var sample = document.createElement("audio")
-					sample.src = "piano/piano." + i + ".wav"
-					sample.type = "audio/wav"
-					samples.push(sample)
+
+					if ( i < 10 ){
+						sample.src = "piano/piano.00" + i + ".ogg";
+						samples.push(sample)
+
+					} else if ( i < 100){
+
+						sample.src = "piano/piano.0" + i + ".ogg";
+						samples.push(sample)
+
+					} else {
+
+						sample.src = "piano/piano." + i + ".ogg";
+						samples.push(sample)
+					}
 
 			};
-
-			samples[40].play();
 
 
 
