@@ -11,13 +11,45 @@
 
 		<style>
 
+			body {
+				font-family: monospace;
+				background-color: black;
+			}
+
+			h1 {
+				/*font-style: italic;*/
+				color: #9A2A24;
+			}
+
+			h3 {
+				font-style: italic;
+			}
+
+			li {
+				/*list-style: none;*/
+				margin: 5px;
+				font-size: 10pt;
+			}
+
+			button {
+				background-color: #A4A7A9;
+				border: 1px solid black;
+				border-radius: 4px;
+				font-family: monospace;
+				cursor: pointer;
+			}
+
+			select {
+				background-color: #A4A7A9;
+			}
+
 			.div-stuff {
 				-webkit-user-select: none;
 				-moz-user-seleect: none;
 				user-select: none;
 				position: relative;
 				display:block;
-				margin: auto;
+				margin: 50px auto;
 				top:20%;
 				width: 100%;
 				max-width: 750px;
@@ -52,8 +84,9 @@
 			}
 
 			#dialL {
+				cursor: pointer;
 			    background: gainsboro;
-			    color: white;
+			    color: black;
 			    width: 13%;
 			    height: 16.11%;
 			    border-radius: 50%;
@@ -61,12 +94,13 @@
 			    position: absolute;
 			    bottom: 0.5%;
 			    left: 1%;
-			    transform: rotateZ(0deg);
+			    transform: rotateZ(-180deg);
 			}
 
 			#dialR {
+				cursor: pointer;
 			    background: gainsboro;
-			    color: white;
+			    color: black;
 			    width: 13%;
 			    height: 16.11%;
 			    border-radius: 50%;
@@ -74,26 +108,28 @@
 			    position: absolute;
 			    bottom: 0.5%;
 			    right: 1%;
-			    transform: rotateZ(0deg)
+			    transform: rotateZ(-180deg)
 			}
 
 			#modal {
 				position: fixed;
 				top: 0px;
 				left: 0px;
-				background: rgba(0,0,0,0.75);
+				background: rgba(0,0,0,0.35);
 				width: 100%;
 				height: 100%;
 				z-index: 99999;
 			}
 
 			#modal-inner {
-			    padding: 20px;
-			    width: 70%;
-			    border-radius: 10px;
-			    background: #ccc;
-			    margin: 10% auto;
+			    padding: 10px;
+			    width: 60%;
+			    max-width: 550px;
+			    background: #A4A7A9;
+			    margin: 150px auto;
+			    display: block;
 			    text-align: left;
+			    border-radius: 12px;
 			}
 
 			#modalL {
@@ -101,7 +137,7 @@
 				display: none;
 				top: 0px;
 				left: 0px;
-				background: rgba(0,0,0,0.75);
+				background: rgba(0,0,0,0.35);
 				width: 100%;
 				height: 100%;
 				z-index: 99999;
@@ -110,9 +146,9 @@
 			#modal-innerL {
 			    padding: 20px;
 			    width: 50%;
-			    border-radius: 10px;
-			    background: #ccc;
-			    margin: 10% auto;
+			    border-radius: 12px;
+			    background: #A4A7A9;
+			    margin: 200px auto;
 			    text-align: center;
 			}
 
@@ -121,7 +157,7 @@
 				display: none;
 				top: 0px;
 				left: 0px;
-				background: rgba(0,0,0,0.75);
+				background: rgba(0,0,0,0.35);
 				width: 100%;
 				height: 100%;
 				z-index: 99999;
@@ -130,9 +166,9 @@
 			#modal-innerR {
 			    padding: 20px;
 			    width: 50%;
-			    border-radius: 10px;
-			    background: #ccc;
-			    margin: 10% auto;
+			    border-radius: 12px;
+			    background: #A4A7A9;
+			    margin: 200px auto;
 			    text-align: center;
 			}
 
@@ -146,22 +182,19 @@
 			<div id="modal">	
 				<div id="modal-inner"> 
 					
-					<p> MIDI piano Etch A Sketch instrument</p>
+					<h1> Etch A Sketch MIDI piano</h1>
+					<h3> a web application that lets users sonify Etch A Sketch drawing via MIDI playback </h3>
 
-					<p>for use with external midi controller:</p>
-		
-						- connect midi device
-					<br>
-						- click dial to assign its MIDI input
-					<br>
-						- repeat for right-hand dial
-					<br>
-					<p>or if no midi controller:</p>
-						- use arrow keys to draw 
-					<br>
-					<p>to clear drawing, press delete key </p>
+						<p>for use with USB midi device:</p>
+							<ul>
+								<li> connect midi controller && it should appear in the dropdown menu below the screen (you may need to refresh the page after plugging controller in)</li>
+								<li>click on a dial && turn a knob on yr MIDI controller to assign it to that dial ~~ reassign the dial to a new MIDI control knob by clicking again && turning a new knob </li>
+							</ul>
 
-					<button id="close">close</button>
+						<p>if no MIDI controller is available, user can draw pixels using the up/right/left/down arrow keys, even though this isn't nearly as much fun as MIDI</p>
+
+
+					<button id="close" style="background-color: #9A2A24; color: #F4AC52">close</button>
 				</div>
 			</div>
 
@@ -170,32 +203,34 @@
 			<div id="dialR">|</div>
 
 			<div id="modalL">
-				<div id="modal-innerL">move a control on your MIDI device to assign it to the left dial</div>
+				<div id="modal-innerL"><p>move a control on your MIDI device to assign it to the left dial</p>
+					<button id="closeL" style="background-color: #9A2A24; color: #F4AC52">close</button>
+				</div>
 			</div>
 
 			<div id="modalR">
-				<div id="modal-innerR">move a control on your MIDI device to assign it to the right dial</div>
+				<div id="modal-innerR"><p>move a control on your MIDI device to assign it to the right dial</p>
+					<button id="closeR" style="background-color: #9A2A24; color: #F4AC52">close</button>
+				</div>
 			</div>
 
-
 		</div>
 
-
+		<div class="clear-drawing-class" style="display:block; margin: -30px auto; ">
+			<button id="clear-drawing" style="display: block; margin: 0px auto;">clear drawing</button>
+		</div>
 		<div class="div-stuff">
 			<select id="inputportselector"></select>		
-			<button id="show">show info</button>
+			<button id="show">show me that info again plz</button>
 		</div>
-
-		<!-- <audio src="piano/piano.30.wav" type="audio/wav" controls autoplay></audio> -->
 
 
 		<script src="js/p5.js"></script>
-		<script src="js/soundfont-player.min.js"></script>
 
 		<script>
 
-		// setup midi && pixel && canvas variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	// this is for the modal ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			var modal = document.getElementById('modal');
 			
@@ -210,6 +245,15 @@
 			}
 
 
+
+		var samples = [];
+		var note;
+		var vol;
+
+
+
+	// setup pixel && canvas variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 			var myScreen = document.getElementById("screen");
 			var screenWidth = myScreen.width;
 			var screenHeight = myScreen.height;
@@ -218,24 +262,23 @@
 			var canvasHeight = screenHeight-(screenHeight*.026020)
 
 			var dialL = document.getElementById("dialL")
-			var dialR = document.getElementById("dialL")
-
-
+			var dialR = document.getElementById("dialR")
 		
-
 			function setup(){
 				var canvas = createCanvas(canvasWidth,canvasHeight);
 				canvas.parent("canvasContainer");
-
 			}
 
 
-			// request MIDI access // does browser have midi ?? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// request MIDI access // does browser have midi ?? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			var midiX = 0;
 			var midiY = 0;
 			var pixelX = 0;
 			var pixelY = 0;
+
+			var degL;
+			var degR;
 
 			var midi = null;
 			var midiDevices = [];
@@ -246,7 +289,7 @@
 						sysex: false
 				    }).then(onMIDISuccess, onMIDIFailure);
 			} else {
-			    alert("No MIDI support in your browser.");
+			    alert("no MIDI support in yr browser, please use Chrome.");
 			}
 
 			function onMIDISuccess(midiAccess) {
@@ -262,7 +305,7 @@
 
 
 
-				// create input selection menu and listen for selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// create input selection menu and listen for selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 				var i = 0;
 				for (var input of midi.inputs.values()) {
@@ -283,7 +326,7 @@
 				});				
 			}
 
-			// listen for midi input ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// listen for midi input ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 			var channelL = -1;
@@ -300,8 +343,11 @@
 			
 				modalL = document.getElementById('modalL');
 				modalL.style.display = "block";
-				
-			})
+			});
+			var closeL = document.getElementById('closeL');
+			closeL.onclick = function(){
+				modalL.style.display = "none";
+			}
 
 
 
@@ -312,18 +358,24 @@
 				modalR = document.getElementById('modalR');
 				modalR.style.display = "block";
 
-			})
+			});
+			var closeR = document.getElementById('closeR');
+			closeR.onclick = function(){
+				modalR.style.display = "none";
+			}
 
 
 
 
-// functions when midi message is received ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 
 			function onMIDIMessage(message){
 
 			// assign midi input to pixel && dial values ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+			// functions when midi message is received ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 				if(channelListeningL==true){
 					channelL= message.data[1] ;
@@ -343,30 +395,29 @@
 				}
 
 				if(message.data[1] == channelR){
-					midiY = ( message.data[2] );
-					pixelY = Math.abs( midiY*(canvasHeight/127) - (canvasHeight));
+					midiY = Math.abs( message.data[2] - 128 );
+					pixelY = Math.abs( midiY*(canvasHeight/127));
  				}
 
-				var degL = (midiX * 2.8125) - 180 + "deg"
-				dialL.style.transform =	"rotateZ(" + degL.toString() + ")";
+				degL = (midiX * 2.8125) - 180;
+				dialL.style.transform =	"rotateZ(" + degL.toString() + "deg" + ")";
 
-				var degR = (midiY * 2.8125) - 180 + "deg"				
-				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
+				degR = (midiY * 2.8125) - 180;				
+				dialR.style.transform =	"rotateZ(" + degR.toString() + "deg" + ")";
 
-				var note = midiX;
-				var volume = Math.abs((midiY/127) - 1);
 
-				samples[note].volume = volume;				
-				samples[ note ].play();
+				playNote(degL, degR);
 
 
 			}
+
+
 
 			// assign arrow keys input to pixel && dial values ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 			document.addEventListener("keydown", function(event){
 
-				 var dX = 1.5
+				 var dX = 1.5;
 
 				if(event.keyCode == 39){
 					if(pixelX < canvasWidth){
@@ -386,13 +437,80 @@
 					}
 				}
 
-				var degL = (pixelX * 360/canvasWidth) - 180 + "deg"
-				dialL.style.transform =	"rotateZ(" + degL.toString() + ")";
+				degL = (pixelX * 360/canvasWidth) - 180
+				dialL.style.transform =	"rotateZ(" + degL.toString() + "deg" + ")";
 
-				var degR = (pixelY * 360/canvasHeight) - 180 + "deg"			
-				dialR.style.transform =	"rotateZ(" + degR.toString() + ")";
+				degR = (pixelY * 360/canvasHeight) - 180			
+				dialR.style.transform =	"rotateZ(" + degR.toString() + "deg" + ")";
+
+				
+				playNote(degL, degR); 
 
 			});
+
+	// here is the web audio api stuff 
+
+
+			var context = new window.AudioContext();
+			var gainNode = context.createGain();
+			var source;
+			var url = samples[note];
+
+			for (var i = 1; i < 129; i++) {
+
+				if ( i < 10 ){
+					var sample = "http://jen.zone/piano/piano.00" + i + ".ogg";
+					samples.push(sample)
+
+				} else if ( i < 100){
+					var sample = "http://jen.zone/piano/piano.0" + i + ".ogg";
+					samples.push(sample)
+
+				} else {
+					var sample = "http://jen.zone/piano/piano." + i + ".ogg";
+					samples.push(sample)
+				}
+
+			};
+			
+			
+			function getData(url){
+				source = context.createBufferSource();
+				var request = new XMLHttpRequest();
+				request.open('GET', url, true);
+				request.responseType = 'arraybuffer';
+
+				// decode asynchronously -->
+
+				request.onload = function(){
+					var audioData = request.response;
+					context.decodeAudioData(audioData, function(buffer){
+						source.buffer = buffer;
+						source.connect(gainNode);
+						gainNode.connect(context.destination);
+					}, function(e){ console.log("Error with decoding audio data" + e.err); });
+				}
+				request.send();
+			}
+
+
+			function playNote(degL, degR){  
+
+				note = Math.round(((degL+180)/360)*127);
+				console.log(note);
+
+				gainNode.gain.value = ((degR+180)/360);
+				console.log(gainNode.gain.value);
+
+				getData(samples[note]);
+				source.start(0);
+
+				// console.log(samples[note]);
+
+			}
+
+
+
 
 
 
@@ -400,16 +518,19 @@
 
 
 
-			var sX = canvasWidth/127;
-			var sY = canvasHeight/127;
+			var sX = canvasWidth/126;
+			var sY = canvasHeight/126;
 
 			function myPixel(){
-				fill("#000000");
+				stroke("#333333");
+				fill("#333333");
 				rect(pixelX, pixelY, sX, sX);
 			}
 
+			document.getElementById("clear-drawing").addEventListener("click", function(){
 
-
+				clear();
+			})
 
 			function draw(){	
 
@@ -420,43 +541,15 @@
 					pixelY = canvasHeight-2*sX;
 				}
 
-					myPixel();
+				myPixel();
 			}
 
 
 
 			function onMIDIFailure(e) {
 			    // when we get a failed response, run this code
-			    alert("only works on chrome sry !!! :'(");
+			    alert("something went wrong with the MIDI setup, mayebe try again ?");
 			}
-
-
-			// LOAD SAMPLES STUFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-
-
-			var samples = [];
-
-			for (var i = 1; i < 129; i++) {
-
-				var sample = document.createElement("audio")
-
-					if ( i < 10 ){
-						sample.src = "piano/piano.00" + i + ".ogg";
-						samples.push(sample)
-
-					} else if ( i < 100){
-
-						sample.src = "piano/piano.0" + i + ".ogg";
-						samples.push(sample)
-
-					} else {
-
-						sample.src = "piano/piano." + i + ".ogg";
-						samples.push(sample)
-					}
-
-			};
-
 
 
 
@@ -465,6 +558,6 @@
 		</script>
 
 
-
 	</body>
 </html>
+
